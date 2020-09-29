@@ -1,5 +1,6 @@
 package ru.skillbranch.devintensive.models
 
+import ru.skillbranch.devintensive.utils.Utils
 import java.util.*
 
 data class User(
@@ -9,8 +10,8 @@ data class User(
     var avatar: String?,
     var rating: Int = 0,
     var respect: Int = 0,
-    var lastVisit: Date? = Date(),
-    var isOnline: Boolean = false
+    val lastVisit: Date? = Date(),
+    val isOnline: Boolean = false
 ) {
     constructor(id: String, firstName: String?, lastName: String?) : this(
         id,
@@ -26,15 +27,7 @@ data class User(
 
         fun makeUser(fullName: String?): User {
             ++lastId
-            if (fullName.isNullOrBlank()) {
-                return User("$lastId", null, null)
-            }
-            val list = fullName.split(" ")
-            val (firstName, lastName) = if (list.size == 2) {
-                list[0] to list[1]
-            } else {
-                null to null
-            }
+            val (firstName, lastName) = Utils.parseFullName(fullName)
             return User("$lastId", firstName, lastName)
         }
     }

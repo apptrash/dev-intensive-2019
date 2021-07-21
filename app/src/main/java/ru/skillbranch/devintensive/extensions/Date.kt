@@ -3,6 +3,7 @@ package ru.skillbranch.devintensive.extensions
 import ru.skillbranch.devintensive.utils.Utils.makePlural
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.math.absoluteValue
 
 const val SECOND = 1000L
 const val MINUTE = 60 * SECOND
@@ -27,9 +28,17 @@ fun Date.add(value: Int, units: TimeUnits = TimeUnits.SECOND): Date {
 fun Date.humanizeDiff(date: Date = Date()): String {
     val diff = date.time - time
     return when {
-        diff <= SECOND -> "только что"
-        diff <= 45 * SECOND -> "несколько секунд назад"
-        diff <= 75 * SECOND -> "минуту назад"
+        diff < -360 * DAY -> "более чем через год"
+        diff < -26 * HOUR -> "через ${TimeUnits.DAY.plural(diff.absoluteValue / DAY)}"
+        diff < -22 * HOUR -> "через день"
+        diff < -75 * MINUTE -> "через ${TimeUnits.HOUR.plural(diff.absoluteValue / HOUR)}"
+        diff < -45 * MINUTE -> "через час"
+        diff < -75 * SECOND -> "через ${TimeUnits.MINUTE.plural(diff.absoluteValue / MINUTE)}"
+        diff < -45 * SECOND -> "через минуту" // -75..-45
+        diff < -SECOND -> "через несколько секунд" // -1..0
+        diff <= SECOND -> "только что" // 0 - 1
+        diff <= 45 * SECOND -> "несколько секунд назад" // 1-45
+        diff <= 75 * SECOND -> "минуту назад" // 45-75
         diff <= 45 * MINUTE -> "${TimeUnits.MINUTE.plural(diff / MINUTE)} назад"
         diff <= 75 * MINUTE -> "час назад"
         diff <= 22 * HOUR -> "${TimeUnits.HOUR.plural(diff / HOUR)} назад"
